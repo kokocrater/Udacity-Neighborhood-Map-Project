@@ -7,9 +7,7 @@
     <link rel="stylesheet" href="css/styles.css">
 </head>
 <body>
-    <div id="map">
-        <p data-bind="text: location"></p>
-    </div>
+    <div id="map"></div>
     <div id="nav">
         <div id="toggle">
             <svg id="toggle-button" data-bind="click: toggleNav" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
@@ -17,12 +15,13 @@
             </svg>
         </div>
         <div>
-            <p>Where: </p>
+            <p>Search</p>
             <input data-bind="value: location">
         </div>
+        <div id="list"></div>
     </div>
 </body>
 <script type="text/javascript" src="js/knockout.js"></script>
 <script type="text/javascript" src="js/jquery.min.js"></script>
 <script type="text/javascript" src="js/script.js"></script>
-<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyATeRLtczLguj2EKAhpL6wIiA2tPDe3T-s&libraries=places,drawing,geometry&v=3&callback=initMap"></script>
+<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyATeRLtczLguj2EKAhpL6wIiA2tPDe3T-s&libraries=places,geometry&v=3&callback=initMap"></script>

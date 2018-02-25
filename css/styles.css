@@ -28,7 +28,6 @@ svg {
     position: absolute;
     right: 0px;
 }
-
 #nav {
     color: white;
     background-color: #111;
@@ -42,6 +41,9 @@ svg {
     /*padding-left: 10px;*/  /*shows edge of nav when offscreen*/
     margin-right: 10px;
 }
+#list {
+    font-size: 0.6em;
+}
 #toggle {
     padding-left: 260px;
 }
@@ -53,6 +55,10 @@ svg {
 }
 #toggle.open {
     padding-left: 10px;
+}
+#pano {
+    height: 200px;
+    width: 200px;
 }
 @media screen and (min-width: 1200px) {
     #map {
