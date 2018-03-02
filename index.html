@@ -16,9 +16,12 @@
         </div>
         <div>
             <p>Search</p>
-            <input data-bind="value: location">
+            <input data-bind="value: search, click: resetMap">
+            <button data-bind="click: filterLocations">Search</button>
         </div>
-        <div id="list"></div>
+        <ul id="list" data-bind="foreach: titles">
+            <li data-bind="text: $data"></li>
+        </ul>
     </div>
 </body>
 <script type="text/javascript" src="js/knockout.js"></script>

@@ -3,13 +3,13 @@ html, body {
     margin: 0;
     height: 100%;
     width: 100%;
+    font-family: sans-serif;
+    font-size: 1.5em;
 }
 p {
     margin-bottom: 0px;
     margin-left: 10px;
-    margin-top: 5px;
-    font-family: sans-serif;
-    font-size: 1.5em;
+    margin-top: 5px
 }
 input {
     margin-left: 10px;
@@ -20,6 +20,9 @@ svg {
     border-radius: 10px;
     height: 50px;
     width: 50px;
+}
+li {
+    font-size: 0.5em;
 }
 #map {
     background-color: #ddd;
@@ -40,9 +43,6 @@ svg {
     padding-top: 10px;
     /*padding-left: 10px;*/  /*shows edge of nav when offscreen*/
     margin-right: 10px;
-}
-#list {
-    font-size: 0.6em;
 }
 #toggle {
     padding-left: 260px;
