@@ -2,8 +2,8 @@ var map;
 markers = ko.observableArray();
 titles = ko.observableArray();
 matches = ko.observableArray();
-locations = ko.observableArray([
-    {title: 'Vernon\'s BBQ', location: {lat: 38.662186, lng: -90.3091335}, keywords: ['restaurants', 'food', 'dining', 'barbecue']},
+locations = [
+    {title: 'Vernon\'s BBQ', location: {lat: 38.662186, lng: -90.3091335}, keywords: ['restaurants', 'food', 'dining', 'barbecue', 'BBQ']},
     {title: 'Blueberry Hill', location: {lat: 38.655825, lng: -90.3051857}, keywords: ['restaurants', 'food', 'dining', 'burgers', 'beer']},
     {title: 'Grill Stop', location: {lat: 38.6721711, lng: -90.338078}, keywords: ['restaurants', 'food', 'dining', 'burgers', 'steak']},
     {title: 'Pi Pizza', location: {lat: 38.65501260000001, lng: -90.2977494}, keywords: ['restaurants', 'food', 'dining', 'pizza']},
@@ -12,19 +12,24 @@ locations = ko.observableArray([
     {title: 'The Hi-Pointe Theater', location: {lat: 38.6326471, lng: -90.3050145}, keywords: ['movies', 'theaters', 'entertainment']},
     {title: 'St Louis Art Museum', location: {lat: 38.6393062, lng: -90.2944911}, keywords: ['attractions', 'museums', 'art']},
     {title: 'St Louis Science Center', location: {lat: 38.62866289999999, lng: -90.2705766}, keywords: ['attractions', 'museums', 'education']}
-  ]);
+  ];
 
 function initMap() {
-    map = new google.maps.Map($('#map')[0], {//https://stackoverflow.com/questions/4069982/document-getelementbyid-vs-jquery
-    center: {lat: 38.6505741992262, lng: -90.30530998931883},//https://stackoverflow.com/questions/9810624/how-to-get-coordinates-of-the-center-of-the-viewed-area-in-google-maps-using-goo
-    zoom: 14,
-  mapTypeControl: false
-    });
+    try{
+        map = new google.maps.Map($('#map')[0], {//https://stackoverflow.com/questions/4069982/document-getelementbyid-vs-jquery
+        center: {lat: 38.6505741992262, lng: -90.30530998931883},//https://stackoverflow.com/questions/9810624/how-to-get-coordinates-of-the-center-of-the-viewed-area-in-google-maps-using-goo
+        zoom: 14,
+      mapTypeControl: false
+        });
+    }
+    catch(err) {
+        window.alert("Google maps failed to load: " + err.message);
+    }
   var infoWindow = new google.maps.InfoWindow();
 
-  for (var i = 0; i < locations().length; i++) {
-    var position = locations()[i].location;
-    var title = locations()[i].title;
+  for (var i = 0; i < locations.length; i++) {
+    var position = locations[i].location;
+    var title = locations[i].title;
     var label = (i+1).toString();
     var marker = new google.maps.Marker({
       position: position,
@@ -106,15 +111,15 @@ function AppViewModel() {
         //with matching titles.  For markers() the matching indexes are compared to it.  Markers
         //at non-matching indexes are hidden.
         titles.removeAll();
-        for (var i = 0; i < locations().length; i++) {
+        for (var i = 0; i < locations.length; i++) {
             //If the text in the search box matches any location titles...
-            if (this.search().toLowerCase() == locations()[i].title.toLowerCase()) {
+            if (this.search().toLowerCase() == locations[i].title.toLowerCase()) {
                 //push the index of the matching location to matches().
                 matches.push(i);
             } else {
-                for (var l = 0; l < locations()[i].keywords.length; l++) {
+                for (var l = 0; l < locations[i].keywords.length; l++) {
                     //or is the text in the seach box matches any keyword...
-                    if (this.search().toLowerCase() == locations()[i].keywords[l].toLowerCase()) {
+                    if (this.search().toLowerCase() == locations[i].keywords[l].toLowerCase()) {
                         //push the index of the matching location to matches().
                         matches.push(i);
                     }
@@ -125,7 +130,7 @@ function AppViewModel() {
         // titles.removeAll();
         for (var i = 0; i < matches().length; i++) {
             var titleIndex = matches()[i];
-            var matchedTitle = locations()[titleIndex].title;
+            var matchedTitle = locations[titleIndex].title;
             titles.push(matchedTitle);
         }
         //hide un-matched markers
@@ -141,7 +146,7 @@ function AppViewModel() {
         this.search('');
         //If there are no matches, reset the map and alert the user.
         if (matches().length == 0) {
-            resetMap();
+            this.resetMap();
             window.alert("No matches found!");
         }
     }
