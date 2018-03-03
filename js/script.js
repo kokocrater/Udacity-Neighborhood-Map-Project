@@ -1,17 +1,18 @@
+"use strict"
 var map;
-markers = ko.observableArray();
-titles = ko.observableArray();
-matches = ko.observableArray();
-locations = [
-    {title: 'Vernon\'s BBQ', location: {lat: 38.662186, lng: -90.3091335}, keywords: ['restaurants', 'food', 'dining', 'barbecue', 'BBQ']},
-    {title: 'Blueberry Hill', location: {lat: 38.655825, lng: -90.3051857}, keywords: ['restaurants', 'food', 'dining', 'burgers', 'beer']},
-    {title: 'Grill Stop', location: {lat: 38.6721711, lng: -90.338078}, keywords: ['restaurants', 'food', 'dining', 'burgers', 'steak']},
-    {title: 'Pi Pizza', location: {lat: 38.65501260000001, lng: -90.2977494}, keywords: ['restaurants', 'food', 'dining', 'pizza']},
-    {title: 'House of India', location: {lat: 38.6611271, lng: -90.3559915}, keywords: ['restaurants', 'food', 'dining', 'indian']},
-    {title: 'The Tivoli Theater', location: {lat: 38.6556587, lng: -90.3033799}, keywords: ['movies', 'theaters', 'entertainment']},
-    {title: 'The Hi-Pointe Theater', location: {lat: 38.6326471, lng: -90.3050145}, keywords: ['movies', 'theaters', 'entertainment']},
-    {title: 'St Louis Art Museum', location: {lat: 38.6393062, lng: -90.2944911}, keywords: ['attractions', 'museums', 'art']},
-    {title: 'St Louis Science Center', location: {lat: 38.62866289999999, lng: -90.2705766}, keywords: ['attractions', 'museums', 'education']}
+var markers = ko.observableArray();
+var titles = ko.observableArray();
+var matches = ko.observableArray();
+var locations = [
+    {title: "Vernon\'s BBQ", location: {lat: 38.662186, lng: -90.3091335}, keywords: ["restaurants", "food", "dining", "barbecue", "BBQ"]},
+    {title: "Blueberry Hill", location: {lat: 38.655825, lng: -90.3051857}, keywords: ["restaurants", "food", "dining", "burgers", "beer"]},
+    {title: "Grill Stop", location: {lat: 38.6721711, lng: -90.338078}, keywords: ["restaurants", "food", "dining", "burgers", "steak"]},
+    {title: "Pi Pizza", location: {lat: 38.65501260000001, lng: -90.2977494}, keywords: ["restaurants", "food", "dining", "pizza"]},
+    {title: "House of India", location: {lat: 38.6611271, lng: -90.3559915}, keywords: ["restaurants", "food", "dining", "indian"]},
+    {title: "The Tivoli Theater", location: {lat: 38.6556587, lng: -90.3033799}, keywords: ["movies", "theaters", "entertainment"]},
+    {title: "The Hi-Pointe Theater", location: {lat: 38.6326471, lng: -90.3050145}, keywords: ["movies", "theaters", "entertainment"]},
+    {title: "St Louis Art Museum", location: {lat: 38.6393062, lng: -90.2944911}, keywords: ["attractions", "museums", "art"]},
+    {title: "St Louis Science Center", location: {lat: 38.62866289999999, lng: -90.2705766}, keywords: ["attractions", "museums", "education"]}
   ];
 
 function initMap() {
@@ -91,7 +92,7 @@ $.ajax({
         }
 
         if (!hours) {
-            hours = "Hours are not avialable"
+            hours = "Hours are not avialable";
         }
         //populate the infoWindow
         infoWindow.setContent('<div><strong>' + marker.title + '</strong></div><br>' +
@@ -117,39 +118,43 @@ function AppViewModel() {
                 //push the index of the matching location to matches().
                 matches.push(i);
             } else {
-                for (var l = 0; l < locations[i].keywords.length; l++) {
+                for (var j = 0; j < locations[i].keywords.length; j++) {
                     //or is the text in the seach box matches any keyword...
-                    if (this.search().toLowerCase() == locations[i].keywords[l].toLowerCase()) {
+                    if (this.search().toLowerCase() == locations[i].keywords[j].toLowerCase()) {
                         //push the index of the matching location to matches().
                         matches.push(i);
                     }
                 }
             }
         }
-        //make the title the only title in the titles() observableArray.
-        // titles.removeAll();
-        for (var i = 0; i < matches().length; i++) {
-            var titleIndex = matches()[i];
+        //make the title(s) the only title(s) in the titles() observableArray.
+        for (var k = 0; k < matches().length; k++) {
+            var titleIndex = matches()[k];
             var matchedTitle = locations[titleIndex].title;
             titles.push(matchedTitle);
         }
         //hide un-matched markers
-        for (var j = 0; j < matches().length; j++) {
-                var markerIndex = matches()[j];
+        for (var l = 0; l < matches().length; l++) {
+                //Use the value of the current matches() item as the index of
+                //a marker to be removed from markers()
+                var markerIndex = matches()[l];
+                //Replace the removed marker with 'null' so that indexes of
+                //other markers remain the same.
                 markers.splice(markerIndex, 1, null);//https://www.w3schools.com/jsref/jsref_splice.asp AND https://blog.mariusschulz.com/2016/07/16/removing-elements-from-javascript-arrays
         }
         for (var m = 0; m < markers().length; m++) {
+            //Hide the markers that are not 'null'.
             if (markers()[m]) {
             markers()[m].setMap(null);
             }
         }
         this.search('');
         //If there are no matches, reset the map and alert the user.
-        if (matches().length == 0) {
+        if (matches().length === 0) {
             this.resetMap();
             window.alert("No matches found!");
         }
-    }
+    };
 
     this.resetMap = function() {
         this.search('');
@@ -157,11 +162,11 @@ function AppViewModel() {
         markers.removeAll();
         matches.removeAll();
         initMap();
-    }
+    };
     this.toggleNav = function() {
     $('#nav').toggleClass('open');
     $('#toggle').toggleClass('open');
-    }
+    };
 }
 
 // Activates knockout.js
