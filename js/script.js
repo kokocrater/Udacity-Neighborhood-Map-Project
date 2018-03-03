@@ -1,8 +1,9 @@
 var map;
 markers = ko.observableArray();
 titles = ko.observableArray();
+matches = ko.observableArray();
 locations = ko.observableArray([
-    {title: 'Vernon\'s BBQ', location: {lat: 38.662186, lng: -90.3091335}, keywords: ['restaurants', 'food', 'dining', 'barbuecue']},
+    {title: 'Vernon\'s BBQ', location: {lat: 38.662186, lng: -90.3091335}, keywords: ['restaurants', 'food', 'dining', 'barbecue']},
     {title: 'Blueberry Hill', location: {lat: 38.655825, lng: -90.3051857}, keywords: ['restaurants', 'food', 'dining', 'burgers', 'beer']},
     {title: 'Grill Stop', location: {lat: 38.6721711, lng: -90.338078}, keywords: ['restaurants', 'food', 'dining', 'burgers', 'steak']},
     {title: 'Pi Pizza', location: {lat: 38.65501260000001, lng: -90.2977494}, keywords: ['restaurants', 'food', 'dining', 'pizza']},
@@ -36,7 +37,7 @@ function initMap() {
         this.setAnimation(google.maps.Animation.BOUNCE);
         setTimeout(this.setAnimation(null), 1000); //https://developers.google.com/maps/documentation/javascript/examples/marker-animations
     });
-    markers.push(marker);
+    markers().push(marker);
     titles.push(marker.title);
   }
     showMarkers(markers);
@@ -100,50 +101,61 @@ $.ajax({
 function AppViewModel() {
     this.search = ko.observable("");
     this.filterLocations = function() {
-        var index;
+        //Because titles() is an array of strings and markers() is an array of objects constructed
+        //in initMap() they are handled differently.  For titles() the array is cleared then repopulated
+        //with matching titles.  For markers() the matching indexes are compared to it.  Markers
+        //at non-matching indexes are hidden.
+        titles.removeAll();
         for (var i = 0; i < locations().length; i++) {
             //If the text in the search box matches any location titles...
             if (this.search().toLowerCase() == locations()[i].title.toLowerCase()) {
-                //make the title the only title in the titles() observableArray.
-                titles.removeAll();
-                titles.push(locations()[i].title);
-                this.hideMarkers(i);
+                //push the index of the matching location to matches().
+                matches.push(i);
             } else {
                 for (var l = 0; l < locations()[i].keywords.length; l++) {
-                    if (this.search() == locations()[i].keywords[l]) {
-                    console.log(locations()[i].keywords[l]);
-                        titles.removeAll();
-                        titles.push(locations()[i].title);
-                        this.hideMarkers(i);
+                    //or is the text in the seach box matches any keyword...
+                    if (this.search().toLowerCase() == locations()[i].keywords[l].toLowerCase()) {
+                        //push the index of the matching location to matches().
+                        matches.push(i);
                     }
                 }
             }
         }
-}
+        //make the title the only title in the titles() observableArray.
+        // titles.removeAll();
+        for (var i = 0; i < matches().length; i++) {
+            var titleIndex = matches()[i];
+            var matchedTitle = locations()[titleIndex].title;
+            titles.push(matchedTitle);
+        }
+        //hide un-matched markers
+        for (var j = 0; j < matches().length; j++) {
+                var markerIndex = matches()[j];
+                markers.splice(markerIndex, 1, null);//https://www.w3schools.com/jsref/jsref_splice.asp AND https://blog.mariusschulz.com/2016/07/16/removing-elements-from-javascript-arrays
+        }
+        for (var m = 0; m < markers().length; m++) {
+            if (markers()[m]) {
+            markers()[m].setMap(null);
+            }
+        }
+        this.search('');
+        //If there are no matches, reset the map and alert the user.
+        if (matches().length == 0) {
+            resetMap();
+            window.alert("No matches found!");
+        }
+    }
+
     this.resetMap = function() {
         this.search('');
         titles.removeAll();
         markers.removeAll();
+        matches.removeAll();
         initMap();
     }
     this.toggleNav = function() {
     $('#nav').toggleClass('open');
     $('#toggle').toggleClass('open');
-    }
-
-    this.hideMarkers = function(i) {
-        for (var j = 0; j < i; j++){
-                    //Remove all of the markers with an index lower than the matched index..
-                    markers()[j].setMap(null);
-                }
-                for (var k = i + 1; k < markers().length; k++) {
-                    //and also remove all of the markers with an index higher than the matched index.
-                    markers()[k].setMap(null);
-                }
-    }
-
-    this.clickedLi = function() {
-        console.log("list clicked");
     }
 }
 
