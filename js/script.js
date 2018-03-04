@@ -135,17 +135,17 @@ function AppViewModel() {
         }
         //hide un-matched markers
         for (var l = 0; l < matches().length; l++) {
-                //Use the value of the current matches() item as the index of
-                //a marker to be removed from markers()
-                var markerIndex = matches()[l];
-                //Replace the removed marker with 'null' so that indexes of
-                //other markers remain the same.
-                markers.splice(markerIndex, 1, null);//https://www.w3schools.com/jsref/jsref_splice.asp AND https://blog.mariusschulz.com/2016/07/16/removing-elements-from-javascript-arrays
+            //Use the value of the current matches() item as the index of
+            //a marker to be removed from markers()
+            var markerIndex = matches()[l];
+            //Replace the removed marker with 'null' so that indexes of
+            //other markers remain the same.
+            markers.splice(markerIndex, 1, null);//https://www.w3schools.com/jsref/jsref_splice.asp AND https://blog.mariusschulz.com/2016/07/16/removing-elements-from-javascript-arrays
         }
         for (var m = 0; m < markers().length; m++) {
             //Hide the markers that are not 'null'.
             if (markers()[m]) {
-            markers()[m].setMap(null);
+                markers()[m].setMap(null);
             }
         }
         this.search('');
@@ -164,8 +164,8 @@ function AppViewModel() {
         initMap();
     };
     this.toggleNav = function() {
-    $('#nav').toggleClass('open');
-    $('#toggle').toggleClass('open');
+        $('#nav').toggleClass('open');
+        $('#toggle').toggleClass('open');
     };
 }
 
