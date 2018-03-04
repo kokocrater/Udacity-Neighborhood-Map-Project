@@ -1,4 +1,3 @@
-"use strict";
 let map;
 let markers = ko.observableArray();
 let titles = ko.observableArray();
@@ -16,6 +15,7 @@ let locations = [
   ];
 
 function initMap() {
+    "use strict";
     try{
         map = new google.maps.Map($('#map')[0], {//https://stackoverflow.com/questions/4069982/document-getelementbyid-vs-jquery
         center: {lat: 38.6505741992262, lng: -90.30530998931883},//https://stackoverflow.com/questions/9810624/how-to-get-coordinates-of-the-center-of-the-viewed-area-in-google-maps-using-goo
@@ -54,12 +54,14 @@ function initMap() {
 }
 
 function showMarkers(markers) {
+    "use strict";
     for (let i = 0; i < markers().length; i++) {
         markers()[i].setMap(map);
     }
 }
 
 function openInfoWindow(marker, infoWindow) {
+    "use strict";
     if (infoWindow.marker != marker) {
     infoWindow.setContent('');
     infoWindow.marker = marker;
@@ -109,6 +111,7 @@ $.ajax({
 }
 
 function AppViewModel() {
+    "use strict";
     this.search = ko.observable("");
     this.filterLocations = function() {
         //Because titles() is an array of strings and markers() is an array of objects constructed
