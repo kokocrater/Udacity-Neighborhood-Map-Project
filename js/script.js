@@ -1,6 +1,9 @@
 let map;
+//markers() stores the map markers created for each object in locations().  See initMap().
 let markers = ko.observableArray();
+//titles() stores the string location.title for each each object in locations().  See initMap().
 let titles = ko.observableArray();
+//matches() stores the index(es) of items in titles() that match a seach or selection.  See AppViewModel.selectTitle() and AppViewModel.searchLocations().
 let matches = ko.observableArray();
 let locations = [
     {title: "Vernon\'s BBQ", location: {lat: 38.662186, lng: -90.3091335}, keywords: ["restaurants", "food", "dining", "barbecue", "BBQ"]},
@@ -16,16 +19,14 @@ let locations = [
 
 function initMap() {
     "use strict";
-    try{
-        map = new google.maps.Map($('#map')[0], {//https://stackoverflow.com/questions/4069982/document-getelementbyid-vs-jquery
-        center: {lat: 38.6505741992262, lng: -90.30530998931883},//https://stackoverflow.com/questions/9810624/how-to-get-coordinates-of-the-center-of-the-viewed-area-in-google-maps-using-goo
-        zoom: 14,
-      mapTypeControl: false
+    //https://stackoverflow.com/questions/4069982/document-getelementbyid-vs-jquery
+    map = new google.maps.Map(document.getElementById('map'), {
+        //https://stackoverflow.com/questions/9810624/how-to-get-coordinates-of-the-center-of-the-viewed-area-in-google-maps-using-goo
+        center: {lat: 38.6505741992262, lng: -90.30530998931883},
+        zoom: 13,
+        mapTypeControl: false
         });
-    }
-    catch(err) {
-        window.alert("Google maps failed to load: " + err.message);
-    }
+
   let infoWindow = new google.maps.InfoWindow();
 
   for (let i = 0; i < locations.length; i++) {
@@ -39,19 +40,33 @@ function initMap() {
       label: label
     });
     addMarkerListener(marker);
-    markers().push(marker);
+    markers.push(marker);
     titles.push(marker.title);
   }
+
   function addMarkerListener(marker) {
     marker.addListener('click', function() {
-        console.log(marker.title);
         openInfoWindow(marker, infoWindow);
         marker.setAnimation(google.maps.Animation.BOUNCE);
-        setTimeout(marker.setAnimation(null), 1000); //https://developers.google.com/maps/documentation/javascript/examples/marker-animations
+        //https://developers.google.com/maps/documentation/javascript/examples/marker-animations
+        setTimeout(marker.setAnimation(null), 1000);
     });
 }
+
     showMarkers(markers);
+}  //END initMap()
+
+
+
+function handleScriptError() {
+    alert('Google Maps failed to load!');
 }
+
+// function selectTitle() {
+//     $('ul li')(function(){ //https://stackoverflow.com/questions/3811313/how-to-get-the-index-of-list-items-on-click-of-li-using-jquery
+//         console.log($(this).index());
+//     });
+// }
 
 function showMarkers(markers) {
     "use strict";
@@ -65,15 +80,15 @@ function openInfoWindow(marker, infoWindow) {
     if (infoWindow.marker != marker) {
     infoWindow.setContent('');
     infoWindow.marker = marker;
-    // infoWindow.setContent('<div><strong>'+marker.title+'</strong></div>');
     infoWindow.open(map, marker);
     infoWindow.addListener('closeclick', function() {
       infoWindow.marker = null;
     });
     }
-    //Since the foursquare api url doesn't accept place names (see: https://stackoverflow.com/questions/11583447/searching-venues-by-name-only),
-    //this let takes the position of the marker, converts it to a string and removes the parentheses and space to match the format of the
-    //foursquare 'll'.
+    //Since the foursquare api url doesn't accept place names
+    //(see: https://stackoverflow.com/questions/11583447/searching-venues-by-name-only),
+    //'ll' takes the position of the marker, converts it to a string and removes
+    //the parentheses and space to match the format of the foursquare 'll'.
     let ll = marker.position.toString().slice(1, -1).replace(', ', ',');
 $.ajax({
     type: "GET",
@@ -105,20 +120,34 @@ $.ajax({
             '<div>' + address0 + '</div>' +
             '<div>' + address1 + '</div>' +
             '<div>' + phone + '</div>' +
-            '<div>' + hours + '</div>');
+            '<div>' + hours + '</div>' +
+            '<div><i>' + "Information provided by " + '<a href="http://foursquare.com">' +
+            'foursquare.com</a></i></div>');
         }
+    }).fail(function() {
+        infoWindow.setContent('<div><strong>' + marker.title + '</strong></div><br>' +
+            'Location data is not avialable at this time.');
     });
 }
 
 function AppViewModel() {
     "use strict";
-    this.search = ko.observable("");
-    this.filterLocations = function() {
+    this.search = ko.observable('');
+    this.isVisible = ko.observable(true);
+    this.selectTitle = function(location) {
+        matches.removeAll();
+        // https://discussions.udacity.com/t/how-to-get-the-index-from-a-value-of-a-knockout-array/197103
+        let selectedTitleIndex = titles().indexOf(location);
+        console.log(selectedTitleIndex);
+        matches.push(selectedTitleIndex);
+        console.log(matches());
+        this.hideMarkers();
+    };
+    this.searchLocations = function() {
         //Because titles() is an array of strings and markers() is an array of objects constructed
         //in initMap() they are handled differently.  For titles() the array is cleared then repopulated
         //with matching titles.  For markers() the matching indexes are compared to it.  Markers
         //at non-matching indexes are hidden.
-        titles.removeAll();
         for (let i = 0; i < locations.length; i++) {
             //If the text in the search box matches any location titles...
             if (this.search().toLowerCase() == locations[i].title.toLowerCase()) {
@@ -134,20 +163,19 @@ function AppViewModel() {
                 }
             }
         }
-        //make the title(s) the only title(s) in the titles() observableArray.
-        for (let k = 0; k < matches().length; k++) {
-            let titleIndex = matches()[k];
-            let matchedTitle = locations[titleIndex].title;
-            titles.push(matchedTitle);
-        }
-        //hide un-matched markers
+        //Hide the markers that aren't matched
+        this.hideMarkers();
+    };
+
+    this.hideMarkers = function() {
         for (let l = 0; l < matches().length; l++) {
             //Use the value of the current matches() item as the index of
             //a marker to be removed from markers()
             let markerIndex = matches()[l];
             //Replace the removed marker with 'null' so that indexes of
             //other markers remain the same.
-            markers.splice(markerIndex, 1, null);//https://www.w3schools.com/jsref/jsref_splice.asp AND https://blog.mariusschulz.com/2016/07/16/removing-elements-from-javascript-arrays
+            //https://www.w3schools.com/jsref/jsref_splice.asp AND https://blog.mariusschulz.com/2016/07/16/removing-elements-from-javascript-arrays
+            markers.splice(markerIndex, 1, null);
         }
         for (let m = 0; m < markers().length; m++) {
             //Hide the markers that are not 'null'.
@@ -159,22 +187,31 @@ function AppViewModel() {
         //If there are no matches, reset the map and alert the user.
         if (matches().length === 0) {
             this.resetMap();
-            window.alert("No matches found!");
+            window.alert('No matches found!');
         }
     };
 
+    // this.selectedTitle = function(true) {
+    //     if (true) {
+    //         return false;
+    //     } else {
+    //         return true;
+    //     }
+    // };
+
     this.resetMap = function() {
         this.search('');
+        this.isVisible(true)
         titles.removeAll();
         markers.removeAll();
         matches.removeAll();
         initMap();
     };
     this.toggleNav = function() {
-        $('#nav').toggleClass('open');
-        $('#toggle').toggleClass('open');
+        $('.nav').toggleClass('open');
+        $('.toggle').toggleClass('open');
     };
-}
+} //END ViewModel
 
 // Activates knockout.js
 ko.applyBindings(new AppViewModel());

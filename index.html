@@ -1,30 +1,36 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <title>Neighborhood Map</title>
-    <meta name=”viewport” content=”width=device-width, initial-scale=1”>
-    <!-- <link rel="stylesheet" href="css/bootstrap.min.css"> -->
-    <link rel="stylesheet" href="css/styles.css">
-</head>
-<body>
-    <div id="map"></div>
-    <div id="nav">
-        <div id="toggle">
-            <svg id="toggle-button" data-bind="click: toggleNav" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-              <path d="M2 6h20v3H2zm0 5h20v3H2zm0 5h20v3H2z"></path>
-            </svg>
+    <head>
+        <title>Neighborhood Map</title>
+        <meta name="viewport" content="width=device-width" initial-scale="1">
+        <!-- <link rel="stylesheet" href="css/bootstrap.min.css"> -->
+        <link rel="stylesheet" href="css/styles.css">
+    </head>
+    <body>
+        <div id="map" class="map"></div>
+        <div class="nav">
+            <div class="toggle">
+                <svg class="toggle-button" data-bind="click: toggleNav" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+                  <path d="M2 6h20v3H2zm0 5h20v3H2zm0 5h20v3H2z"></path>
+                </svg>
+            </div>
+            <div>
+                <p>Search</p>
+                <!-- http://knockoutjs.com/examples/simpleList.html -->
+                <input data-bind="value: search, valueUpdate: 'afterkeydown', click: resetMap">
+                <button data-bind="click: searchLocations, visible: search().length > 0">Search</button>
+            </div>
+            <div>
+                <ul class="list" data-bind="foreach: titles">
+                    <!-- https://discussions.udacity.com/t/click-binding-not-working-for-knockout-viewmodel/235038 -->
+                    <li data-bind="text: $data, click: $root.selectTitle"></li>
+                <!-- <select name="select" id="select" data-bind="options: titles, selectedOptions: matches"></select> -->
+            </div>
         </div>
-        <div>
-            <p>Search</p>
-            <input data-bind="value: search, click: resetMap">
-            <button data-bind="click: filterLocations">Search</button>
-        </div>
-        <ul id="list" data-bind="foreach: titles">
-            <li data-bind="text: $data"></li>
-        </ul>
-    </div>
-</body>
-<script type="text/javascript" src="js/knockout.js"></script>
-<script type="text/javascript" src="js/jquery.min.js"></script>
-<script type="text/javascript" src="js/script.js"></script>
-<script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyATeRLtczLguj2EKAhpL6wIiA2tPDe3T-s&libraries=places,geometry&v=3&callback=initMap"></script>
+
+        <script type="text/javascript" src="js/knockout.js"></script>
+        <script type="text/javascript" src="js/jquery.min.js"></script>
+        <script type="text/javascript" src="js/script.js"></script>
+        <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyATeRLtczLguj2EKAhpL6wIiA2tPDe3T-s&libraries=places,geometry&v=3&callback=initMap" onerror="handleScriptError()"></script>
+    </body>
+</html>

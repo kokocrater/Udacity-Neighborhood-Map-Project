@@ -4,4 +4,5 @@ Markers for each location appear on the map and the names of each location appea
 - When a marker is clicked it bounces once and an infoWindow opens, displaying the name of the location (from the title property of the marker), and the address, telephone number and hours (from the Foursquare API).  If the API data is not avialable the appropriate infoWindow field is noted. 
 - At screen sizes less that 1200px the Nav is off-screen by default and it's visibility is toggeled by the hamburger button at the top.
 - The Nav element has a Search field near the top.  The Search function matches text entered into the Search field with location names or strings in the 'keywords' property of each location.  The Search function is initiated by the Search button.  If no match is found an alert is displayed.  Searches are case-insensitive.
+- To install this project on a local machine clone this repository (which includes the required bootstrap, jquery and knockout files).  Run the application by by double-clicking the index.html file.
 - This project is published at [github.io](https://kokocrater.github.io/Udacity-Neighborhood-Map-Project/).
