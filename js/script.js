@@ -1,9 +1,12 @@
 let map;
-//markers() stores the map markers created for each object in locations().  See initMap().
-let markers = ko.observableArray();
-//titles() stores the string location.title for each each object in locations().  See initMap().
+//markers[] stores the map markers created for each object in locations().
+//See initMap().
+let markers = [];
+//titles() stores the title of each location that has an index matching the values in matches().
+//See initMap() and showLocations.
 let titles = ko.observableArray();
-//matches() stores the index(es) of items in titles() that match a seach or selection.  See AppViewModel.selectTitle() and AppViewModel.searchLocations().
+//matches() stores the index(es) of all locations at initialization/reset or all times that match a search.
+//See initMap(), showLocations(), AppViewModel.selectTitle(), AppViewModel.searchLocations() and resetMap().
 let matches = ko.observableArray();
 let locations = [
     {title: "Vernon\'s BBQ", location: {lat: 38.662186, lng: -90.3091335}, keywords: ["restaurants", "food", "dining", "barbecue", "BBQ"]},
@@ -41,7 +44,7 @@ function initMap() {
     });
     addMarkerListener(marker);
     markers.push(marker);
-    titles.push(marker.title);
+    matches.push(i);
   }
 
   function addMarkerListener(marker) {
@@ -53,17 +56,24 @@ function initMap() {
     });
 }
 
-    showMarkers(markers);
+    showLocations(matches);
 }  //END initMap()
 
 function handleScriptError() {
     alert('Google Maps failed to load!');
 }
 
-function showMarkers(markers) {
+function showLocations(matches) {
+    //displays all titles and markers that have indexes in matches().
     "use strict";
-    for (let i = 0; i < markers().length; i++) {
-        markers()[i].setMap(map);
+    titles.removeAll();
+    for (let h = 0; h < markers.length; h++) {
+    markers[h].setMap(null);
+    }
+    for (let i = 0; i < matches().length; i++) {
+        let matchedIndex = matches()[i];
+        markers[matchedIndex].setMap(map);
+        titles.push(markers[matchedIndex].title);
     }
 }
 
@@ -129,82 +139,55 @@ function AppViewModel() {
     self.search = ko.observable('');
     self.isVisible = ko.observable(true);
     self.selectTitle = function(location) {
-        //Because 'enable: titles().length > 1' binding won't work with <li>...
+        //Because 'enable: titles().length > 1' binding won't work with <li>,
+        //keep clicked title from affecting UI while locations are filtered.
         if (titles().length < locations.length) {
             return;
         } else {
-        //display only the selected title and its marker
+        //push the index of the selected title to matches().
         // https://discussions.udacity.com/t/how-to-get-the-index-from-a-value-of-a-knockout-array/197103
         let selectedTitleIndex = titles().indexOf(location);
         matches.removeAll();
         matches.push(selectedTitleIndex);
-        titles.removeAll();
-        titles.push(locations[selectedTitleIndex].title);
-        self.hideMarkers();
+        showLocations(matches);
         }
     };
     self.searchLocations = function() {
-        //Because titles() is an array of strings and markers() is an array of objects constructed
-        //in initMap() they are handled differently.  For titles() the array is cleared then repopulated
-        //with matching titles.  For markers() the matching indexes are compared to it.  Markers
-        //at non-matching indexes are hidden.
-        titles.removeAll();
+        matches.removeAll();
         for (let i = 0; i < locations.length; i++) {
             //If the text in the search box matches any location titles...
             if (self.search().toLowerCase() == locations[i].title.toLowerCase()) {
                 //push the index of the matching location to matches().
-                titles.push(locations[i].title);
                 matches.push(i);
             } else {
                 for (let j = 0; j < locations[i].keywords.length; j++) {
                     //or is the text in the seach box matches any keyword...
                     if (self.search().toLowerCase() == locations[i].keywords[j].toLowerCase()) {
                         //push the index of the matching location to matches().
-                        titles.push(locations[i].title);
                         matches.push(i);
                     }
                 }
             }
-
-        // titles.removeAll();
-        // titles.push(locations[matches()[i]].title);
         }
-        //Hide the markers that aren't matched
-        self.hideMarkers();
-    };
-
-    self.hideMarkers = function() {
-        for (let l = 0; l < matches().length; l++) {
-            //Use the value of the current matches() item as the index of
-            //a marker to be removed from markers()
-            let markerIndex = matches()[l];
-            //Replace the removed marker with 'null' so that indexes of
-            //other markers remain the same.
-            //https://www.w3schools.com/jsref/jsref_splice.asp AND https://blog.mariusschulz.com/2016/07/16/removing-elements-from-javascript-arrays
-            markers.splice(markerIndex, 1, null);
-        }
-        for (let m = 0; m < markers().length; m++) {
-            //Hide the markers that are not 'null'.
-            if (markers()[m]) {
-                markers()[m].setMap(null);
-            }
-        }
-        self.search('');
         //If there are no matches, reset the map and alert the user.
         if (matches().length === 0) {
             self.resetMap();
             window.alert('No matches found!');
+        } else {
+        showLocations(matches);
         }
     };
 
     self.resetMap = function() {
         self.search('');
-        self.isVisible(true)
-        titles.removeAll();
-        markers.removeAll();
+        //Clear matches() and refresh it will indecies for all locations.
         matches.removeAll();
-        initMap();
+        for (let n = 0; n < locations.length; n++) {
+            matches.push(n);
+        }
+        showLocations(matches);
     };
+
     self.toggleNav = function() {
         $('.nav').toggleClass('open');
         $('.toggle').toggleClass('open');

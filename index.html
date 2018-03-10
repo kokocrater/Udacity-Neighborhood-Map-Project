@@ -17,7 +17,7 @@
             <div>
                 <p>Search</p>
                 <!-- http://knockoutjs.com/examples/simpleList.html -->
-                <input data-bind="value: search, valueUpdate: 'afterkeydown', click: resetMap">
+                <input data-bind="value: search, valueUpdate: 'afterkeydown'">
                 <button data-bind="click: searchLocations, visible: search().length > 0">Search</button>
                 <button data-bind="click: resetMap, visible: titles().length < locations.length">Clear Search</button>
             </div>
