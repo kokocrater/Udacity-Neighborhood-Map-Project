@@ -56,17 +56,9 @@ function initMap() {
     showMarkers(markers);
 }  //END initMap()
 
-
-
 function handleScriptError() {
     alert('Google Maps failed to load!');
 }
-
-// function selectTitle() {
-//     $('ul li')(function(){ //https://stackoverflow.com/questions/3811313/how-to-get-the-index-of-list-items-on-click-of-li-using-jquery
-//         console.log($(this).index());
-//     });
-// }
 
 function showMarkers(markers) {
     "use strict";
@@ -121,7 +113,7 @@ $.ajax({
             '<div>' + address1 + '</div>' +
             '<div>' + phone + '</div>' +
             '<div>' + hours + '</div>' +
-            '<div><i>' + "Information provided by " + '<a href="http://foursquare.com">' +
+            '<div><i>' + "Information provided by " + '<a href="http://foursquare.com" target="_blank">' +
             'foursquare.com</a></i></div>');
         }
     }).fail(function() {
@@ -132,42 +124,56 @@ $.ajax({
 
 function AppViewModel() {
     "use strict";
-    this.search = ko.observable('');
-    this.isVisible = ko.observable(true);
-    this.selectTitle = function(location) {
-        matches.removeAll();
+    //https://discussions.udacity.com/t/knockout-js-this-hidemarkers-is-not-a-function/626387/2
+    let self = this;
+    self.search = ko.observable('');
+    self.isVisible = ko.observable(true);
+    self.selectTitle = function(location) {
+        //Because 'enable: titles().length > 1' binding won't work with <li>...
+        if (titles().length < locations.length) {
+            return;
+        } else {
+        //display only the selected title and its marker
         // https://discussions.udacity.com/t/how-to-get-the-index-from-a-value-of-a-knockout-array/197103
         let selectedTitleIndex = titles().indexOf(location);
-        console.log(selectedTitleIndex);
+        matches.removeAll();
         matches.push(selectedTitleIndex);
-        console.log(matches());
-        this.hideMarkers();
+        titles.removeAll();
+        titles.push(locations[selectedTitleIndex].title);
+        self.hideMarkers();
+        }
     };
-    this.searchLocations = function() {
+    self.searchLocations = function() {
         //Because titles() is an array of strings and markers() is an array of objects constructed
         //in initMap() they are handled differently.  For titles() the array is cleared then repopulated
         //with matching titles.  For markers() the matching indexes are compared to it.  Markers
         //at non-matching indexes are hidden.
+        titles.removeAll();
         for (let i = 0; i < locations.length; i++) {
             //If the text in the search box matches any location titles...
-            if (this.search().toLowerCase() == locations[i].title.toLowerCase()) {
+            if (self.search().toLowerCase() == locations[i].title.toLowerCase()) {
                 //push the index of the matching location to matches().
+                titles.push(locations[i].title);
                 matches.push(i);
             } else {
                 for (let j = 0; j < locations[i].keywords.length; j++) {
                     //or is the text in the seach box matches any keyword...
-                    if (this.search().toLowerCase() == locations[i].keywords[j].toLowerCase()) {
+                    if (self.search().toLowerCase() == locations[i].keywords[j].toLowerCase()) {
                         //push the index of the matching location to matches().
+                        titles.push(locations[i].title);
                         matches.push(i);
                     }
                 }
             }
+
+        // titles.removeAll();
+        // titles.push(locations[matches()[i]].title);
         }
         //Hide the markers that aren't matched
-        this.hideMarkers();
+        self.hideMarkers();
     };
 
-    this.hideMarkers = function() {
+    self.hideMarkers = function() {
         for (let l = 0; l < matches().length; l++) {
             //Use the value of the current matches() item as the index of
             //a marker to be removed from markers()
@@ -183,31 +189,23 @@ function AppViewModel() {
                 markers()[m].setMap(null);
             }
         }
-        this.search('');
+        self.search('');
         //If there are no matches, reset the map and alert the user.
         if (matches().length === 0) {
-            this.resetMap();
+            self.resetMap();
             window.alert('No matches found!');
         }
     };
 
-    // this.selectedTitle = function(true) {
-    //     if (true) {
-    //         return false;
-    //     } else {
-    //         return true;
-    //     }
-    // };
-
-    this.resetMap = function() {
-        this.search('');
-        this.isVisible(true)
+    self.resetMap = function() {
+        self.search('');
+        self.isVisible(true)
         titles.removeAll();
         markers.removeAll();
         matches.removeAll();
         initMap();
     };
-    this.toggleNav = function() {
+    self.toggleNav = function() {
         $('.nav').toggleClass('open');
         $('.toggle').toggleClass('open');
     };

@@ -19,12 +19,12 @@
                 <!-- http://knockoutjs.com/examples/simpleList.html -->
                 <input data-bind="value: search, valueUpdate: 'afterkeydown', click: resetMap">
                 <button data-bind="click: searchLocations, visible: search().length > 0">Search</button>
+                <button data-bind="click: resetMap, visible: titles().length < locations.length">Clear Search</button>
             </div>
             <div>
                 <ul class="list" data-bind="foreach: titles">
                     <!-- https://discussions.udacity.com/t/click-binding-not-working-for-knockout-viewmodel/235038 -->
                     <li data-bind="text: $data, click: $root.selectTitle"></li>
-                <!-- <select name="select" id="select" data-bind="options: titles, selectedOptions: matches"></select> -->
             </div>
         </div>
 
