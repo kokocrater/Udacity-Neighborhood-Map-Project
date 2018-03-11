@@ -15,8 +15,18 @@ p {
 }
 
 input,
-button {
+button,
+datalist {
     margin-left: 10px;
+    margin-right: 10px;
+}
+
+datalist {
+    /*https://www.w3schools.com/tags/tag_datalist.asp*/
+    display: block;
+    background: white;
+    color: #111;
+    font-size: 0.5em;
 }
 
 svg {
@@ -70,6 +80,14 @@ li {
 .pano {
     height: 200px;
     width: 200px;
+}
+
+.suggestions {
+    font-size: 0.6em;
+}
+
+.suggestions-list {
+  list-style-type: none;
 }
 
 @media screen and (min-width: 1200px) {

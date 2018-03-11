@@ -8,6 +8,8 @@ let titles = ko.observableArray();
 //matches() stores the index(es) of all locations at initialization/reset or all times that match a search.
 //See initMap(), showLocations(), AppViewModel.selectTitle(), AppViewModel.searchLocations() and resetMap().
 let matches = ko.observableArray();
+//searchMatches is used for displaying possible search matches.
+let autoMatches = ko.observableArray();
 let locations = [
     {title: "Vernon\'s BBQ", location: {lat: 38.662186, lng: -90.3091335}, keywords: ["restaurants", "food", "dining", "barbecue", "BBQ"]},
     {title: "Blueberry Hill", location: {lat: 38.655825, lng: -90.3051857}, keywords: ["restaurants", "food", "dining", "burgers", "beer"]},
@@ -139,7 +141,8 @@ function AppViewModel() {
     self.search = ko.observable('');
     self.isVisible = ko.observable(true);
     self.selectTitle = function(location) {
-        //Because 'enable: titles().length > 1' binding won't work with <li>,
+        matches.removeAll();
+        //Because 'enable' binding won't work with <li>,
         //keep clicked title from affecting UI while locations are filtered.
         if (titles().length < locations.length) {
             return;
@@ -147,7 +150,6 @@ function AppViewModel() {
         //push the index of the selected title to matches().
         // https://discussions.udacity.com/t/how-to-get-the-index-from-a-value-of-a-knockout-array/197103
         let selectedTitleIndex = titles().indexOf(location);
-        matches.removeAll();
         matches.push(selectedTitleIndex);
         showLocations(matches);
         }
@@ -171,13 +173,46 @@ function AppViewModel() {
         }
         //If there are no matches, reset the map and alert the user.
         if (matches().length === 0) {
-            self.resetMap();
             window.alert('No matches found!');
+            self.resetMap();
         } else {
+        self.search('');
+        $('.suggestions').empty();
         showLocations(matches);
+        autoMatches.removeAll();
         }
     };
 
+    self.autoComplete = function() {
+        //https://www.youtube.com/watch?v=uaa9HVC-tQA
+        autoMatches.removeAll();
+        for (let k = 0; k < locations.length; k++) {
+            //If the text in the search field matches any part of location title...
+            if (self.search().length > 0 && locations[k].title.toLowerCase().indexOf(self.search().toLowerCase()) != -1) {
+                //and if the title has not already been matched...
+                if (autoMatches().indexOf(locations[k].title) == -1) {
+                //add the title to the array.  The next for loop does the same with keywords.
+                autoMatches.push(locations[k].title);
+                }
+            }
+            for (let l = 0; l < locations[k].keywords.length; l++) {
+                if (self.search().length > 0 && locations[k].keywords[l].toLowerCase().indexOf(self.search().toLowerCase()) != -1) {
+                    if (autoMatches().indexOf(locations[k].keywords[l]) == -1) {
+                    autoMatches.push(locations[k].keywords[l]);
+                    }
+                }
+            }
+        }
+        $('.suggestions').text('Suggestions');
+    };
+
+    self.selectMatch = function(selection) {
+        self.search(selection);
+        $('.suggestions').empty();
+        self.searchLocations();
+    };
+
+    //Called by the Clear Search button.
     self.resetMap = function() {
         self.search('');
         //Clear matches() and refresh it will indecies for all locations.
@@ -186,6 +221,8 @@ function AppViewModel() {
             matches.push(n);
         }
         showLocations(matches);
+        autoMatches.removeAll();
+        $('.suggestions').empty();
     };
 
     self.toggleNav = function() {

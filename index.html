@@ -3,7 +3,6 @@
     <head>
         <title>Neighborhood Map</title>
         <meta name="viewport" content="width=device-width" initial-scale="1">
-        <!-- <link rel="stylesheet" href="css/bootstrap.min.css"> -->
         <link rel="stylesheet" href="css/styles.css">
     </head>
     <body>
@@ -17,14 +16,24 @@
             <div>
                 <p>Search</p>
                 <!-- http://knockoutjs.com/examples/simpleList.html -->
-                <input data-bind="value: search, valueUpdate: 'afterkeydown'">
+                <input name="d" list="a" data-bind="value: search, valueUpdate: 'afterkeydown', event: {keyup: autoComplete}">
+            </div>
+                <!-- https://blogs.oracle.com/geertjan/html5-datalist-with-knockoutjs -->
+                <!-- https://stackoverflow.com/questions/6865943/html-form-select-option-vs-datalist-option -->
+            <div>
+                <p id="suggestions" class="suggestions"></p>
+                <ul class="suggestions-list" data-bind="foreach: autoMatches">
+                    <li data-bind="text: $data, click: $root.selectMatch"></li>
+                </ul>
+            </div>
+            <div>
                 <button data-bind="click: searchLocations, visible: search().length > 0">Search</button>
                 <button data-bind="click: resetMap, visible: titles().length < locations.length">Clear Search</button>
             </div>
             <div>
                 <ul class="list" data-bind="foreach: titles">
                     <!-- https://discussions.udacity.com/t/click-binding-not-working-for-knockout-viewmodel/235038 -->
-                    <li data-bind="text: $data, click: $root.selectTitle"></li>
+                    <li data-bind="text: $data, click: $root.selectTitle"></li>  <!-- , visible: this.indexOf(locations) = 1 -->
             </div>
         </div>
 
