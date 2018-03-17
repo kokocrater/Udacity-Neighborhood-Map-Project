@@ -15,26 +15,9 @@ p {
 }
 
 input,
-button,
-datalist {
+button {
     margin-left: 10px;
     margin-right: 10px;
-}
-
-datalist {
-    /*https://www.w3schools.com/tags/tag_datalist.asp*/
-    display: block;
-    background: white;
-    color: #111;
-    font-size: 0.5em;
-}
-
-svg {
-    background-color: white;
-    border: 2px solid #111;
-    border-radius: 10px;
-    height: 50px;
-    width: 50px;
 }
 
 li {
@@ -50,31 +33,30 @@ li {
 }
 
 .nav {
-    color: white;
-    background-color: #111;
     height: 100%;
     width: 250px;
-    position: absolute;
-    transform: translate(-250px, 0);
-    transition: transform 0.2s ease;
+    color: white;
+    background-color: #111;
     line-height: 35px;
     padding-top: 10px;
-    /*padding-left: 10px;*/  /*shows edge of nav when offscreen*/
-    margin-right: 10px;
+    /*https://stackoverflow.com/questions/270493/how-would-you-make-two-divs-overlap*/
+    margin-left: -65px;
+    z-index: 1;
+}
+
+.nav-content {
+    padding-top: 60px;
+    padding-left: 20px;
+    padding-right: 10px;
 }
 
 .toggle {
-    padding-left: 260px;
-}
-
-.nav.open {
-    transform: translate(0, 0);
-    transition: transform 0.2s ease;
-    padding-left: 10px;
-}
-
-.toggle.open {
-    padding-left: 10px;
+    width: 45px;
+    height: 45px;
+    margin-top: 10px;
+    margin-left: 10px;
+    border-radius: 7px;
+    z-index: 2;
 }
 
 .pano {
@@ -90,16 +72,16 @@ li {
   list-style-type: none;
 }
 
-@media screen and (min-width: 1200px) {
+@media screen and (min-width: 1300px) {
     .map {
     width: 84%;
     }
     .nav {
         width: 16%;
         transform: translate(0, 0);
-        transition: transform 0.2s ease;
+        margin-left: 0px;
     }
-    .toggle-button {
+    .toggle {
         display: none;
     }
 }

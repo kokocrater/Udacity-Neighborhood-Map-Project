@@ -2,45 +2,51 @@
 <html>
     <head>
         <title>Neighborhood Map</title>
+        <meta charset="utf-8">
         <meta name="viewport" content="width=device-width" initial-scale="1">
         <link rel="stylesheet" href="css/styles.css">
     </head>
     <body>
         <div id="map" class="map"></div>
-        <div class="nav">
-            <div class="toggle">
-                <svg class="toggle-button" data-bind="click: toggleNav" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
-                  <path d="M2 6h20v3H2zm0 5h20v3H2zm0 5h20v3H2z"></path>
-                </svg>
-            </div>
-            <div>
+        <!-- ..........HAMBURGER.......... -->
+        <button id="toggle" class="toggle" data-bind="click: toggleNav">
+            <svg class="toggle-button" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+              <path d="M2 6h20v3H2zm0 5h20v3H2zm0 5h20v3H2z"></path>
+            </svg>
+        </button>
+        <container id="nav" class="nav" data-bind="fadeVisible: seeNav">
+            <div class="nav-content">
+                <!-- ..........SEARCH.......... -->
                 <p>Search</p>
+                <!-- ..........BUTTONS.......... -->
+                <div>
+                    <button data-bind="click: clearSearch, visible: matchedLocationTitles().length < locations.length">Clear Search</button>
+                </div>
                 <!-- http://knockoutjs.com/examples/simpleList.html -->
                 <input name="d" list="a" data-bind="value: search, valueUpdate: 'afterkeydown', event: {keyup: autoComplete}">
-            </div>
                 <!-- https://blogs.oracle.com/geertjan/html5-datalist-with-knockoutjs -->
                 <!-- https://stackoverflow.com/questions/6865943/html-form-select-option-vs-datalist-option -->
-            <div>
-                <p id="suggestions" class="suggestions"></p>
-                <ul class="suggestions-list" data-bind="foreach: autoMatches">
-                    <li data-bind="text: $data, click: $root.selectMatch"></li>
-                </ul>
-            </div>
-            <div>
-                <button data-bind="click: searchLocations, visible: search().length > 0">Search</button>
-                <button data-bind="click: resetMap, visible: titles().length < locations.length">Clear Search</button>
-            </div>
-            <div>
-                <ul class="list" data-bind="foreach: titles">
-                    <!-- https://discussions.udacity.com/t/click-binding-not-working-for-knockout-viewmodel/235038 -->
-                    <li data-bind="text: $data, click: $root.selectTitle"></li>  <!-- , visible: this.indexOf(locations) = 1 -->
-                </ul>
-            </div>
-        </div>
+                <div>
+                    <p id="suggestions" class="suggestions"></p>
+                    <ul class="suggestions-list" data-bind="foreach: keywordMatches">
+                        <li data-bind="text: $data, click: $root.selectMatch"></li>
+                    </ul>
+                </div>
 
-        <script type="text/javascript" src="js/knockout.js"></script>
-        <script type="text/javascript" src="js/jquery.min.js"></script>
-        <script type="text/javascript" src="js/script.js"></script>
+                <!-- ..........LIST.......... -->
+                <div>
+                    <ul class="list" data-bind="foreach: matchedLocationTitles">
+                        <!-- https://discussions.udacity.com/t/click-binding-not-working-for-knockout-viewmodel/235038 -->
+                        <li data-bind="text: title, click: $root.selectTitle"></li>
+                    </ul>
+                </div>
+            </div>
+        </container>
+
+
+        <script src="js/jquery-3.3.1.min.js"></script>
+        <script src="js/knockout.js"></script>
+        <script src="js/script.js"></script>
         <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyATeRLtczLguj2EKAhpL6wIiA2tPDe3T-s&libraries=places,geometry&v=3&callback=initMap" onerror="handleScriptError()"></script>
     </body>
 </html>
